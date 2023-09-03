@@ -1,0 +1,25 @@
+FROM docker:dind
+
+RUN apk add --no-cache openssh-server
+
+RUN adduser -D devops && echo "devops:password" | chpasswd
+
+RUN getent group docker || addgroup docker
+RUN addgroup devops docker
+
+RUN mkdir -p /home/devops/.ssh && \
+    chown devops:devops /home/devops/.ssh && \
+    chmod 700 /home/devops/.ssh
+
+COPY devops_key.pub /home/devops/.ssh/authorized_keys
+RUN chown devops:devops /home/devops/.ssh/authorized_keys && \
+    chmod 600 /home/devops/.ssh/authorized_keys
+
+RUN ssh-keygen -A
+
+COPY start-services.sh /usr/local/bin/start-services.sh
+RUN chmod +x /usr/local/bin/start-services.sh
+
+EXPOSE 22
+
+CMD ["/usr/local/bin/start-services.sh"]

@@ -1,0 +1,29 @@
+# Log in to container registry
+{{if .RegistryPassword}}
+echo {{.RegistryPassword}} | docker login {{.RegistryName}} -u {{.RegistryUsername}} --password-stdin
+{{end}}
+
+# Check if container exists & get current image hash
+container_exists=$(docker ps -a -q -f name={{.ServerName}})
+if [ -z "$container_exists" ]; then
+	echo "Container {{.ServerName}} does not exist on {{.Host}}"
+	current_image_hash=""
+else
+	current_image_hash=$(docker inspect {{.ServerName}} -f '{{.Image}}')
+	echo "Current Image Hash for {{.ServerName}} on {{.Host}}: $current_image_hash"
+fi
+
+if [ "$current_image_hash" != "{{.DesiredImageHash}}" ]; then
+	echo "Updating container to {{.DesiredImageHash}} on {{.Host}}"
+	docker stop {{.ServerName}} || echo "Failed to stop container %s"
+	docker rm {{.ServerName}} || echo "Failed to remove container %s"
+	docker pull {{.Image}}
+	docker run -d -p 80:{{.ContainerPort}} --name {{.ServerName}} --env ENVIRONMENT={{.Environment}} {{.Image}}
+else
+	echo "Container {{.ServerName}} on {{.Host}} is already up-to-date"
+fi
+
+# Log out of container registry
+{{if .RegistryPassword}}
+docker logout {{.RegistryName}}
+{{end}}

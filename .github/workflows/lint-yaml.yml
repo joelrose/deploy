@@ -1,0 +1,23 @@
+name: YAML
+
+on:
+  pull_request:
+    paths:
+      - '**.yml'
+      - '**.yaml'
+
+permissions:
+  contents: read
+
+jobs:
+  lint-yaml:
+    name: Lint
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: Lint YAML files
+        run: yamllint -c ./.github/yamllint.yml .

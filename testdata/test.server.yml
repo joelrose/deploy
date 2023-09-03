@@ -1,0 +1,4 @@
+image: ghcr.io/mendhak/http-https-echo:30
+containerPort: 8080
+hosts:
+  - localhost
