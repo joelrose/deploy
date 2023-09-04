@@ -18,7 +18,7 @@ if [ "$current_image_hash" != "{{.DesiredImageHash}}" ]; then
 	docker stop {{.ContainerName}} || echo "Failed to stop container %s"
 	docker rm {{.ContainerName}} || echo "Failed to remove container %s"
 	docker pull {{.Image}}
-	docker run -d -p 80:{{.TargetPort}} --name {{.ContainerName}} --env ENVIRONMENT={{.Environment}} {{.Image}}
+	docker run -d -p 80:{{.TargetPort}} --name {{.ContainerName}} {{.EnvironmentVariables}} {{.Image}}
 else
 	echo "Container {{.ContainerName}} on {{.Host}} is already up-to-date"
 fi

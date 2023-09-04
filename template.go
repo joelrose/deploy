@@ -13,15 +13,15 @@ var tmplFile string
 var tmpl = template.Must(template.New("deploy.sh").Parse(tmplFile))
 
 type TemplateData struct {
-	RegistryName     string
-	RegistryUsername string
-	RegistryPassword string
-	DesiredImageHash string
-	ContainerName    string
-	Image            string
-	Host             string
-	Environment      string
-	TargetPort       int
+	RegistryName         string
+	RegistryUsername     string
+	RegistryPassword     string
+	DesiredImageHash     string
+	ContainerName        string
+	Image                string
+	Host                 string
+	EnvironmentVariables string
+	TargetPort           int
 }
 
 func RenderTemplate(t TemplateData) (string, error) {

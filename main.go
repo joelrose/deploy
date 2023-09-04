@@ -14,9 +14,10 @@ import (
 )
 
 type Config struct {
-	Hosts      []string `yaml:"hosts"`
-	Image      string   `yaml:"image"`
-	TargetPort int      `yaml:"targetPort"`
+	Hosts                []string          `yaml:"hosts"`
+	Image                string            `yaml:"image"`
+	TargetPort           int               `yaml:"targetPort"`
+	EnvironmentVariables map[string]string `yaml:"environmentVariables"`
 }
 
 var (
@@ -88,6 +89,14 @@ func main() { //nolint:cyclop // TODO(joelrose): refactor
 			log.Fatal().Err(err).Msg("failed to unmarshal config file")
 		}
 
+		var envVars strings.Builder
+		for k, v := range config.EnvironmentVariables {
+			_, err := envVars.WriteString(fmt.Sprintf("--env %s=%s ", k, v))
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to write environment variable")
+			}
+		}
+
 		// TODO(joelrose): this could panic
 		desiredImageHash := strings.Split(config.Image, ":")[1]
 
@@ -99,15 +108,15 @@ func main() { //nolint:cyclop // TODO(joelrose): refactor
 			log.Debug().Str("addr", addr).Msg("connecting...")
 
 			tmpl, err := RenderTemplate(TemplateData{
-				RegistryName:     *registryName,
-				RegistryUsername: *registryUsername,
-				RegistryPassword: registryPassword,
-				Image:            config.Image,
-				DesiredImageHash: desiredImageHash,
-				ContainerName:    containerName,
-				Host:             host,
-				Environment:      *environment,
-				TargetPort:       config.TargetPort,
+				RegistryName:         *registryName,
+				RegistryUsername:     *registryUsername,
+				RegistryPassword:     registryPassword,
+				Image:                config.Image,
+				DesiredImageHash:     desiredImageHash,
+				ContainerName:        containerName,
+				Host:                 host,
+				EnvironmentVariables: envVars.String(),
+				TargetPort:           config.TargetPort,
 			})
 			if err != nil {
 				log.Fatal().Err(err).Msg("failed to render template")
