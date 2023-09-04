@@ -1,4 +1,16 @@
+<!-- markdownlint-configure-file {
+  "MD013": {
+    "code_blocks": false,
+    "tables": false
+  },
+  "MD033": false,
+  "MD041": false
+} -->
+<div align="center">
+
+[![Go Test](https://github.com/joelrose/deploy/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/joelrose/deploy/actions/workflows/ci.yml)
 # Deploy (WIP)
 
-SOPS_AGE_RECIPIENTS=age14g4yv65ty443a6r585t4ze8ls6quesnud8l074fdw8lzpd28c3pssqmk44
-SOPS_AGE_KEY=AGE-SECRET-KEY-1M6MYSEDVR2F38J3ZN0CMXK56RZYKKE7YCP8JZYLX6HN8QCST0Z8Q4RQSME
+A better [basecamp/kamal](https://github.com/basecamp/kamal), written in Golang.
+
+> :warning: **FYI**: This project is under development and not suited for production use until v1.0.0 is released.
