@@ -16,8 +16,9 @@ import (
 type Config struct {
 	Hosts                []string          `yaml:"hosts"`
 	Image                string            `yaml:"image"`
-	TargetPort           int               `yaml:"targetPort"`
 	EnvironmentVariables map[string]string `yaml:"environmentVariables"`
+	TargetPort           int               `yaml:"targetPort"`
+	NodePort             int               `yaml:"nodePort"`
 }
 
 var (
@@ -117,6 +118,7 @@ func main() { //nolint:cyclop // TODO(joelrose): refactor
 				Host:                 host,
 				EnvironmentVariables: envVars.String(),
 				TargetPort:           config.TargetPort,
+				NodePort:             config.NodePort,
 			})
 			if err != nil {
 				log.Fatal().Err(err).Msg("failed to render template")

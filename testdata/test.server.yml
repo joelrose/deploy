@@ -2,5 +2,6 @@ image: ghcr.io/mendhak/http-https-echo:30
 targetPort: 8080
 environmentVariables:
   ENVIRONMENT: 'stage'
+nodePort: 80
 hosts:
   - localhost

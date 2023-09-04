@@ -22,6 +22,7 @@ type TemplateData struct {
 	Host                 string
 	EnvironmentVariables string
 	TargetPort           int
+	NodePort             int
 }
 
 func RenderTemplate(t TemplateData) (string, error) {
