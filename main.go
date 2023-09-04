@@ -14,9 +14,9 @@ import (
 )
 
 type Config struct {
-	Hosts         []string `yaml:"hosts"`
-	Image         string   `yaml:"image"`
-	ContainerPort int      `yaml:"containerPort"`
+	Hosts      []string `yaml:"hosts"`
+	Image      string   `yaml:"image"`
+	TargetPort int      `yaml:"targetPort"`
 }
 
 var (
@@ -102,12 +102,12 @@ func main() { //nolint:cyclop // TODO(joelrose): refactor
 				RegistryName:     *registryName,
 				RegistryUsername: *registryUsername,
 				RegistryPassword: registryPassword,
+				Image:            config.Image,
 				DesiredImageHash: desiredImageHash,
 				ContainerName:    containerName,
-				Image:            config.Image,
 				Host:             host,
 				Environment:      *environment,
-				ContainerPort:    config.ContainerPort,
+				TargetPort:       config.TargetPort,
 			})
 			if err != nil {
 				log.Fatal().Err(err).Msg("failed to render template")
@@ -119,4 +119,6 @@ func main() { //nolint:cyclop // TODO(joelrose): refactor
 			}
 		}
 	}
+
+	log.Info().Msg("done")
 }
