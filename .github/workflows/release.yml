@@ -15,8 +15,11 @@ jobs:
         goos: [linux, darwin]
         goarch: [amd64, arm64]
     steps:
-      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6
-      - uses: wangyoucao577/go-release-action@2ac3035fa4c4feed6a8272ce278b0577b93cf8e5 # v1.40
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Add binary to release
+        uses: wangyoucao577/go-release-action@2ac3035fa4c4feed6a8272ce278b0577b93cf8e5 # v1.40.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
