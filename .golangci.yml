@@ -1,0 +1,46 @@
+linters:
+  enable-all: true
+  disable:
+    - errorlint
+    - gochecknoglobals
+    - wsl
+    - goerr113
+    - varnamelen
+    - godox
+    - testpackage
+    - gofumpt
+    - paralleltest
+    - scopelint
+    - funlen
+    - tparallel
+    - gomoddirectives
+    - depguard
+    - tagalign
+    - gochecknoinits
+    # deprecated
+    - exhaustivestruct
+    - structcheck
+    - golint
+    - interfacer
+    - maligned
+    - varcheck
+    - deadcode
+    - nosnakecase
+    - ifshort
+issues:
+  exclude-rules:
+    - path: _test.go
+      linters:
+        - exhaustruct
+        - dupl
+linters-settings:
+  wrapcheck:
+    ignoreSigs:
+      - .File(
+      - .Errorf(
+      - .Redirect(
+      - .String(
+      - .Render(
+      - errors.New(
+      - .NoContent(
+      - .JSON(

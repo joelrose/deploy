@@ -4,23 +4,23 @@ echo {{.RegistryPassword}} | docker login {{.RegistryName}} -u {{.RegistryUserna
 {{end}}
 
 # Check if container exists & get current image hash
-container_exists=$(docker ps -a -q -f name={{.ServerName}})
+container_exists=$(docker ps -a -q -f name={{.ContainerName}})
 if [ -z "$container_exists" ]; then
-	echo "Container {{.ServerName}} does not exist on {{.Host}}"
+	echo "Container {{.ContainerName}} does not exist on {{.Host}}"
 	current_image_hash=""
 else
-	current_image_hash=$(docker inspect {{.ServerName}} -f '{{.Image}}')
-	echo "Current Image Hash for {{.ServerName}} on {{.Host}}: $current_image_hash"
+	current_image_hash=$(docker inspect {{.ContainerName}} -f '{{.Image}}')
+	echo "Current Image Hash for {{.ContainerName}} on {{.Host}}: $current_image_hash"
 fi
 
 if [ "$current_image_hash" != "{{.DesiredImageHash}}" ]; then
 	echo "Updating container to {{.DesiredImageHash}} on {{.Host}}"
-	docker stop {{.ServerName}} || echo "Failed to stop container %s"
-	docker rm {{.ServerName}} || echo "Failed to remove container %s"
+	docker stop {{.ContainerName}} || echo "Failed to stop container %s"
+	docker rm {{.ContainerName}} || echo "Failed to remove container %s"
 	docker pull {{.Image}}
-	docker run -d -p 80:{{.ContainerPort}} --name {{.ServerName}} --env ENVIRONMENT={{.Environment}} {{.Image}}
+	docker run -d -p 80:{{.ContainerPort}} --name {{.ContainerName}} --env ENVIRONMENT={{.Environment}} {{.Image}}
 else
-	echo "Container {{.ServerName}} on {{.Host}} is already up-to-date"
+	echo "Container {{.ContainerName}} on {{.Host}} is already up-to-date"
 fi
 
 # Log out of container registry

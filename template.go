@@ -17,7 +17,7 @@ type TemplateData struct {
 	RegistryUsername string
 	RegistryPassword string
 	DesiredImageHash string
-	ServerName       string
+	ContainerName    string
 	Image            string
 	Host             string
 	Environment      string

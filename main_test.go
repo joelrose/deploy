@@ -30,11 +30,12 @@ func TestIntegration(t *testing.T) {
 	require.NoError(t, err)
 
 	if err = pool.Retry(func() error {
-		conn, err := net.DialTimeout("tcp", "localhost:"+resource.GetPort("22/tcp"), 5*time.Second)
+		conn, err := net.DialTimeout("tcp", "localhost:"+resource.GetPort("22/tcp"), 2*time.Second)
 		if err != nil {
-			return err
+			return err //nolint:wrapcheck
 		}
 		conn.Close()
+
 		return nil
 	}); err != nil {
 		log.Fatalf("Failed to connect to container: %v", err)
@@ -43,7 +44,7 @@ func TestIntegration(t *testing.T) {
 	privateKey, err := os.ReadFile("./testdata/devops_key.pem")
 	require.NoError(t, err)
 
-	os.Setenv("SSH_PRIVATE_KEY", string(privateKey))
+	t.Setenv("SSH_PRIVATE_KEY", string(privateKey))
 
 	os.Args = []string{
 		"deploy",
@@ -54,13 +55,17 @@ func TestIntegration(t *testing.T) {
 		"-path=testdata",
 	}
 
+	time.Sleep(1 * time.Second)
+
 	main()
 
-	time.Sleep(5 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	httpPort := resource.GetPort("80/tcp")
-	res, err := http.Get("http://localhost:" + httpPort)
+	res, err := http.Get("http://localhost:" + httpPort) //nolint:noctx
 	require.NoError(t, err)
+
+	require.NoError(t, res.Body.Close())
 
 	require.Equal(t, http.StatusOK, res.StatusCode)
 

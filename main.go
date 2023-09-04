@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
 )
 
@@ -27,24 +26,30 @@ var (
 	registryUsername *string
 	sshPort          *int
 	path             *string
+	verbose          *bool
 )
 
 func init() {
 	environment = flag.String("environment", "", "The environment to deploy")
 	sshUsername = flag.String("sshUsername", "", "The SSH username to use")
-	sshPort = flag.Int("sshPort", 22, "The SSH port to use")
+	sshPort = flag.Int("sshPort", 22, "The SSH port to use") //nolint:gomnd
 	registryName = flag.String("registryName", "ghcr.io", "The name of the registry to use")
 	registryUsername = flag.String("registryUsername", "", "The username of the registry to use")
 	path = flag.String("path", "deployments", "The path to the deployment files")
+	verbose = flag.Bool("verbose", false, "Enable verbose logging")
 }
 
-func main() {
-	zerolog.SetGlobalLevel(zerolog.DebugLevel)
-
+func main() { //nolint:cyclop // TODO(joelrose): refactor
 	flag.Parse()
 
+	log := zerolog.New(os.Stdout).With().Timestamp().Logger()
+
+	if *verbose {
+		log = log.Level(zerolog.DebugLevel)
+	}
+
 	if *environment == "" || *registryUsername == "" || *sshUsername == "" {
-		fmt.Println("Usage: deploy -environment=ENVIRONMENT -registryUsername=REGISTRY_USERNAME -sshUsername=SSH_USERNAME")
+		log.Info().Msg("Missing required arguments: -environment, -registryUsername, -sshUsername")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
@@ -68,9 +73,13 @@ func main() {
 	}
 
 	for _, file := range files {
+		containerName := strings.Split(filepath.Base(file), ".")[1]
+
+		log = log.With().Str("file", file).Str("container", containerName).Logger()
+
 		f, err := os.ReadFile(file)
 		if err != nil {
-			log.Fatal().Err(err).Msg("failed to read file")
+			log.Fatal().Err(err).Msg("failed to read config")
 		}
 
 		var config Config
@@ -79,11 +88,10 @@ func main() {
 			log.Fatal().Err(err).Msg("failed to unmarshal config file")
 		}
 
-		serverName := strings.Split(filepath.Base(file), ".")[1]
 		// TODO(joelrose): this could panic
 		desiredImageHash := strings.Split(config.Image, ":")[1]
 
-		log.Debug().Str("file", file).Str("serverName", serverName).Str("desiredImageHash", desiredImageHash).Msg("deploying...")
+		log.Debug().Str("desiredImageHash", desiredImageHash).Msg("deploying...")
 
 		for _, host := range config.Hosts {
 			addr := host + ":" + strconv.Itoa(*sshPort)
@@ -95,7 +103,7 @@ func main() {
 				RegistryUsername: *registryUsername,
 				RegistryPassword: registryPassword,
 				DesiredImageHash: desiredImageHash,
-				ServerName:       serverName,
+				ContainerName:    containerName,
 				Image:            config.Image,
 				Host:             host,
 				Environment:      *environment,

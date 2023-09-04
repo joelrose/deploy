@@ -16,12 +16,12 @@ func NewSSH(username, privateKey string) (*SSH, error) {
 		return nil, fmt.Errorf("parsing private key: %v", err)
 	}
 
-	sshConfig := &ssh.ClientConfig{
+	sshConfig := &ssh.ClientConfig{ //nolint:exhaustruct
 		User: username,
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeys(signer),
 		},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // TODO(joelrose): this is insecure
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(), //nolint:gosec // TODO(joelrose): this is insecure
 	}
 
 	return &SSH{sshConfig}, nil
